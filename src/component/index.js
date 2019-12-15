@@ -22,7 +22,7 @@ class ReactImageUploadComponent extends React.Component {
     super(props);
     this.state = {
       pictures: [...props.defaultImages],
-      files: [],
+      files: [...props.defaultImages.map((i) => null)],
       fileErrors: []
     };
     this.inputElement = '';
@@ -31,9 +31,13 @@ class ReactImageUploadComponent extends React.Component {
     this.triggerFileUpload = this.triggerFileUpload.bind(this);
   }
 
+  filterFiles(files){
+    return files.filter((f) => f != null);
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot){
     if(prevState.files !== this.state.files){
-      this.props.onChange(this.state.files, this.state.pictures);
+      this.props.onChange(filterFiles(this.state.files), this.state.pictures);
     }
   }
 
@@ -42,7 +46,7 @@ class ReactImageUploadComponent extends React.Component {
    */
   componentWillReceiveProps(nextProps){
     if(nextProps.defaultImages !== this.props.defaultImages){
-      this.setState({pictures: nextProps.defaultImages});
+      this.setState({pictures: nextProps.defaultImages, files: [...props.defaultImages.map((i) => null)]});
     }
   }
 
@@ -89,7 +93,7 @@ class ReactImageUploadComponent extends React.Component {
     }
 
     this.setState({
-      fileErrors
+      fileErrors: fileErrors,
     });
 
     Promise.all(allFilePromises).then(newFilesData => {
